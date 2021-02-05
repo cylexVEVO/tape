@@ -9,6 +9,7 @@ import Open from "../../assets/img/folder-open.svg";
 import Clock from "../../assets/img/clock.svg";
 import Pencil from "../../assets/img/pencil-alt.svg";
 import Trash from "../../assets/img/trash.svg";
+import TrashConfirm from "../../assets/img/trash-confirm.svg";
 import {ChangeEvent} from "react";
 
 const mapState = (state: RootState) => ({
@@ -31,10 +32,11 @@ const connector = connect(mapState, mapDispatch);
 
 type Props = ConnectedProps<typeof connector>;
 
-class Library extends React.Component<Props, {editing: boolean, selected: string[]}> {
+class Library extends React.Component<Props, {editing: boolean, selected: string[], confirmation: boolean}> {
 	state = {
 		editing: false,
-		selected: [""]
+		selected: [""],
+		confirmation: false
 	};
 
 	getLength(length: number) {
@@ -99,7 +101,7 @@ class Library extends React.Component<Props, {editing: boolean, selected: string
 	}
 
 	toggleEditing() {
-		this.setState({editing: !this.state.editing, selected: []});
+		this.setState({editing: !this.state.editing, selected: [], confirmation: false});
 	}
 
 	handleCheckChange(e: ChangeEvent<HTMLInputElement>, id: string) {
@@ -131,7 +133,7 @@ class Library extends React.Component<Props, {editing: boolean, selected: string
 
 	render() {
 		const {currentSongId, playing, setFilter} = this.props;
-		const {editing, selected} = this.state;
+		const {editing, selected, confirmation} = this.state;
 		let library = this.props.library.songs;
 
 		if (this.props.library.filter !== "") library = library.filter((song) => {
@@ -151,16 +153,23 @@ class Library extends React.Component<Props, {editing: boolean, selected: string
 				<table className={"table-auto w-full"}>
 					<thead>
 						<tr>
-							<th><img className={`${editing ? "opacity-100" : "opacity-20 hover:opacity-100 transition ease duration-200"} w-4`}
+							<th><img className={`${editing ? "opacity-100" : "hover-opacity"} w-4`}
 									 alt={"Edit library"}
 									 src={Pencil}
 									 onClick={() => this.toggleEditing()}/></th>
 							<th className={"font-normal text-left"}>
-								{editing &&
-									<button className={"flex items-center focus:outline-none opacity-20 hover:opacity-100 transition ease duration-200 mr-2"}
-											onClick={() => this.removeSelected()}>
-										<img className={"mr-1"} alt={""} src={Trash}/>
+								{editing && !confirmation &&
+									<button className={"flex items-center focus:outline-none hover-opacity mr-2"}
+											onClick={() => this.setState({confirmation: true})}>
+										<img className={"stroke-current mr-1"} alt={""} src={Trash}/>
 										Remove selected
+									</button>
+								}
+								{editing && confirmation &&
+									<button className={"flex items-center focus:outline-none text-red-500 mr-2"}
+											onClick={() => this.removeSelected()}>
+										<img className={"stroke-current mr-1"} alt={""} src={TrashConfirm}/>
+										Confirm
 									</button>
 								}
 								{!editing &&
@@ -182,7 +191,7 @@ class Library extends React.Component<Props, {editing: boolean, selected: string
 												<input className={"mr-2 w-4"} type={"checkbox"} checked={selected.includes(song.id)} onChange={(e) => this.handleCheckChange(e, song.id)}/>
 											}
 											{!editing &&
-												<img className={"opacity-20 hover:opacity-100 transition ease duration-200 mr-2"}
+												<img className={"hover-opacity mr-2"}
 													 alt={playing && currentSongId === song.id ? "Pause" : "Play"}
 													 src={playing && currentSongId === song.id ? InlinePause : InlinePlay}
 													 onClick={() => this.inlineControlToggle(song.id)}/>
@@ -206,7 +215,7 @@ class Library extends React.Component<Props, {editing: boolean, selected: string
 						})}
 						<tr>
 							<td className={"text-center pt-2"} colSpan={5}>
-								<div className={"inline-flex items-center gap-2 opacity-20 hover:opacity-100 transition ease duration-200"} onClick={() => this.importSongs()}>
+								<div className={"inline-flex items-center gap-2 hover-opacity"} onClick={() => this.importSongs()}>
 									<img alt={""} src={Open}/>
 									Import music
 								</div>

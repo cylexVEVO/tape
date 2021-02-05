@@ -12,6 +12,12 @@
 	user-select: none;
 }
 
+@layer components {
+	.hover-opacity {
+		@apply transition ease-in-out duration-200 opacity-20 hover:opacity-100;
+	}
+}
+
 html, body, body > div:first-child, div#__next, div#__next > div {
 	height: 100%;
 }
@@ -51,17 +57,11 @@ html, body, body > div:first-child, div#__next, div#__next > div {
 }
 
 .nav-item {
-	transition: .2s ease;
-	color: rgba(255, 255, 255, .2);
 	font-size: 15px;
 }
 
-.nav-item:hover {
-	color: rgba(255, 255, 255, .4);
-}
-
 .nav-item.selected {
-	color: #ffffff;
+	opacity: 1;
 }
 
 .nav {

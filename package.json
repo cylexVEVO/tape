@@ -11,7 +11,8 @@
     "build-electron": "tsc -p electron-src",
     "build": "npm run build-renderer && npm run build-electron",
     "pack-app": "npm run build && electron-builder --dir",
-    "dist": "npm run build && electron-builder -mwl",
+    "dist-all": "npm run build && electron-builder -mwl",
+    "dist-mac": "npm run build && electron-builder -m",
     "type-check": "tsc"
   },
   "dependencies": {
@@ -50,6 +51,22 @@
       "main",
       "renderer/out"
     ],
-    "icon": "./assets/icon.png"
+    "icon": "./assets/icon.png",
+    "dmg": {
+      "background": "./assets/dmg.png",
+      "contents": [
+        {
+          "x": 90,
+          "y": 230,
+          "name": "Tape Audio.app"
+        },
+        {
+          "x": 440,
+          "y": 230,
+          "path": "/Applications",
+          "type": "link"
+        }
+      ]
+    }
   }
 }
