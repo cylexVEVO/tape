@@ -1,30 +1,27 @@
-import { useEffect } from 'react'
-import Link from 'next/link'
-import Layout from '../components/Layout'
+import * as React from "react";
+import Tape from "../components/Tape";
+import {setupAudioContext} from "../redux";
+import {connect, ConnectedProps} from "react-redux";
+import BottomPanel from "../components/BottomPanel";
 
-const IndexPage = () => {
-  useEffect(() => {
-    // add a listener to 'message' channel
-    global.ipcRenderer.addListener('message', (_event, args) => {
-      alert(args)
-    })
-  }, [])
+const connector = connect(null, {setupAudioContext});
 
-  const onSayHiClick = () => {
-    global.ipcRenderer.send('message', 'hi from next')
-  }
+type Props = ConnectedProps<typeof connector>;
 
-  return (
-    <Layout title="Home | Next.js + TypeScript + Electron Example">
-      <h1>Hello Next.js 👋</h1>
-      <button onClick={onSayHiClick}>Say hi to electron</button>
-      <p>
-        <Link href="/about">
-          <a>About</a>
-        </Link>
-      </p>
-    </Layout>
-  )
+class Index extends React.Component<Props> {
+	componentDidMount() {
+		this.props.setupAudioContext();
+	}
+
+	render() {
+		return (
+			<div className={"h-full bg-black flex items-center justify-center text-white font-sans"}>
+				<audio id={"audio"}/>
+				<Tape/>
+				<BottomPanel/>
+			</div>
+		);
+	}
 }
 
-export default IndexPage
+export default connector(Index);

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="14px" height="14px" viewBox="0 0 14 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>pencil-alt</title>
+    <defs>
+        <filter id="filter-1">
+            <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 1.000000 0 0 0 0 1.000000 0 0 0 0 1.000000 0 0 0 1.000000 0"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+        <g filter="url(#filter-1)" id="pencil-alt">
+            <g transform="translate(1.000000, 1.000000)">
+                <path d="M4.9,1.4 L1.4,1.4 C0.626801,1.4 0,2.026801 0,2.8 L0,10.5 C0,11.27322 0.626801,11.9 1.4,11.9 L9.1,11.9 C9.87322,11.9 10.5,11.27322 10.5,10.5 L10.5,7 M9.51006,0.410053 C10.05676,-0.136682 10.94324,-0.136682 11.48994,0.410053 C12.03671,0.956781 12.03671,1.843212 11.48994,2.389947 L5.47988,8.4 L3.5,8.4 L3.5,6.42012 L9.51006,0.410053 Z" id="Shape" stroke="#4A5568" stroke-width="1.4"></path>
+            </g>
+        </g>
+    </g>
+</svg>

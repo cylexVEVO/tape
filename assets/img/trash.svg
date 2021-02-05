@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="13px" height="14px" viewBox="0 0 13 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>trash</title>
+    <defs>
+        <filter id="filter-1">
+            <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 1.000000 0 0 0 0 1.000000 0 0 0 0 1.000000 0 0 0 1.000000 0"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+        <g filter="url(#filter-1)" id="trash">
+            <g transform="translate(1.000000, 1.000000)">
+                <path d="M10,2.66666667 L9.4218,10.7616667 C9.37193333,11.4594 8.79133333,12 8.09186667,12 L2.57482667,12 C1.87530667,12 1.29472,11.4594 1.24488,10.7616667 L0.666666667,2.66666667 M4,5.33333333 L4,9.33333333 M6.66666667,5.33333333 L6.66666667,9.33333333 M7.33333333,2.66666667 L7.33333333,0.666666667 C7.33333333,0.29848 7.03486667,0 6.66666667,0 L4,0 C3.63181333,0 3.33333333,0.29848 3.33333333,0.666666667 L3.33333333,2.66666667 M0,2.66666667 L10.6666667,2.66666667" id="Shape" stroke="#4A5568" stroke-width="1.33333333"></path>
+            </g>
+        </g>
+    </g>
+</svg>

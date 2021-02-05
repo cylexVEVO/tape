@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="14px" height="14px" viewBox="0 0 14 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>clock</title>
+    <defs>
+        <filter id="filter-1">
+            <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 1.000000 0 0 0 0 1.000000 0 0 0 0 1.000000 0 0 0 0.200000 0"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+        <g id="Panel-Expanded" transform="translate(-556.000000, -263.000000)">
+            <g id="Library" transform="translate(30.000000, 229.000000)">
+                <g id="clock" transform="translate(21.000000, 31.000000)" filter="url(#filter-1)">
+                    <g transform="translate(506.000000, 4.000000)">
+                        <path d="M5.832,3.24 L5.832,5.832 L7.776,7.776 M11.664,5.832 C11.664,9.0529488 9.0529488,11.664 5.832,11.664 C2.61107712,11.664 0,9.0529488 0,5.832 C0,2.61107712 2.61107712,0 5.832,0 C9.0529488,0 11.664,2.61107712 11.664,5.832 Z" id="Shape" stroke="#4A5568" stroke-width="1.296"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

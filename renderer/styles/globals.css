@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+	font-family: "Inter";
+	/* noinspection CssUnknownTarget */
+	src: url("../../assets/font/Inter-Medium.woff2");
+}
+
+* {
+	user-select: none;
+}
+
+html, body, body > div:first-child, div#__next, div#__next > div {
+	height: 100%;
+}
+
+.bottom-panel {
+	background: rgba(255, 255, 255, .03);
+	height: calc(100vh - 100px);
+	top: calc(100vh - 80px);
+	transition: top, backdrop-filter, border-radius, .5s ease;
+}
+
+.bottom-panel.expanded {
+	top: 100px;
+	backdrop-filter: blur(8px);
+	border-radius: 16px 16px 0 0;
+}
+
+.bottom-panel .expand-button {
+	background-color: rgba(255, 255, 255, .15);
+	border-radius: 4px;
+	height: 4px;
+	width: 50px;
+	transition: background-color .2s ease;
+	margin-top: 7px;
+}
+
+.bottom-panel .expand-button-area {
+	height: 18px;
+}
+
+.bottom-panel .expand-button-area:active > .expand-button {
+	background-color: rgba(255, 255, 255, .25);
+}
+
+.bottom-separator {
+	border-bottom: rgba(255, 255, 255, .03) 1px solid;
+}
+
+.nav-item {
+	transition: .2s ease;
+	color: rgba(255, 255, 255, .2);
+	font-size: 15px;
+}
+
+.nav-item:hover {
+	color: rgba(255, 255, 255, .4);
+}
+
+.nav-item.selected {
+	color: #ffffff;
+}
+
+.nav {
+	height: 37px;
+}
+
+.sick-nasty-scrollbar-dude::-webkit-scrollbar {
+	width: 7px;
+	height: 5px;
+}
+
+.sick-nasty-scrollbar-dude::-webkit-scrollbar-button {
+	width: 0;
+	height: 0;
+}
+
+.sick-nasty-scrollbar-dude::-webkit-scrollbar-thumb {
+	background: rgba(255, 255, 255, .3);
+	border-radius: 50px;
+}
+
+.sick-nasty-scrollbar-dude::-webkit-scrollbar-thumb:hover {
+	background: rgba(255, 255, 255, .6);
+}
+
+.sick-nasty-scrollbar-dude::-webkit-scrollbar-thumb:active {
+	background: #ffffff;
+}
+
+.sick-nasty-scrollbar-dude::-webkit-scrollbar-track {
+	background: rgba(0, 0, 0, .3);
+}
+
+.sick-nasty-scrollbar-dude::-webkit-scrollbar-corner {
+	background: transparent;
+}
