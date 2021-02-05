@@ -16,9 +16,10 @@ const spinAnim = css`
 	${spinFrames} 5s linear infinite;
 `;
 
-const G = styled.g<{animate: boolean, translateX: number, translateY: number}>`
+const G = styled.g<{animate: boolean, translateX: number, translateY: number, reversed?: boolean}>`
 	animation: ${spinAnim};
 	animation-play-state: ${props => props.animate ? "running" : "paused"};
+  	${props => props.reversed ? "animation-direction: reverse;" : ""};
 	transform-box: fill-box;
 	transform-origin: center center;
 `;
@@ -69,7 +70,7 @@ class Tape extends React.Component<Props> {
 										<path d="M5.78951976,11.6136517 L11.5099198,5.89205173" id="Path" strokeLinecap="round"/>
 										<circle id="Oval" cx="8.6376" cy="8.592" r="8.16"/>
 									</G>
-									<G animate={playing} translateX={177.6} translateY={0} id="reelright" transform="translate(177.600000, 0.000000)">
+									<G reversed animate={playing} translateX={177.6} translateY={0} id="reelright" transform="translate(177.600000, 0.000000)">
 										<path d="M51.048,30.4368 L51.048,9.1452" id="Path" strokeLinecap="round"/>
 										<path d="M32.2152,63.0588 L13.7748,73.7052" id="Path" strokeLinecap="round"/>
 										<path d="M69.8808,63.06 L88.3224,73.704" id="Path" strokeLinecap="round"/>
@@ -78,7 +79,7 @@ class Tape extends React.Component<Props> {
 										<circle id="reelrightmid" cx="51.1668" cy="51.9792" r="2.2428"/>
 										<circle id="Oval" strokeLinecap="square" cx="51.1668" cy="51.9792" r="50.9988"/>
 									</G>
-									<G animate={playing} translateX={0} translateY={0} id="reelleft">
+									<G reversed animate={playing} translateX={0} translateY={0} id="reelleft">
 										<path d="M66.672,36.0468 L81.1644,20.4492" id="Path" strokeLinecap="round"/>
 										<path d="M58.266,72.7656 L64.5288,93.1152" id="Path" strokeLinecap="round"/>
 										<path d="M30.6708,47.1264 L9.9144,42.3756" id="Path" strokeLinecap="round"/>

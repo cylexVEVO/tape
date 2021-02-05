@@ -98,3 +98,7 @@ html, body, body > div:first-child, div#__next, div#__next > div {
 .sick-nasty-scrollbar-dude::-webkit-scrollbar-corner {
 	background: transparent;
 }
+
+.blur {
+	filter: blur(8px);
+}

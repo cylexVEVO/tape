@@ -60,7 +60,7 @@ class Library extends React.Component<Props, {editing: boolean, selected: string
 		const currentWindow = remote.getCurrentWindow();
 		const dialog = remote.dialog;
 
-		let acceptable = ["mp3", "aac", "wav", "ogg", "m4a"];
+		let acceptable = ["mp3", "aac", "wav", "ogg", "m4a", "flac"];
 
 		dialog.showOpenDialog(currentWindow, {
 			filters: [

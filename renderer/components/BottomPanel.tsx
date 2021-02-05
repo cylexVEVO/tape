@@ -1,20 +1,23 @@
 import * as React from "react";
-import {RootState, resume, pause} from "../redux";
+import {RootState, resume, pause, changeVolume} from "../redux";
 import {connect, ConnectedProps} from "react-redux";
 import Library from "./Library";
 import Rewind from "../../assets/img/rewind.svg";
 import Play from "../../assets/img/play.svg";
 import Pause from "../../assets/img/pause.svg";
 import FastForward from "../../assets/img/fast-forward.svg";
+import Volume from "../../assets/img/volume-up.svg";
 
 const mapState = (state: RootState) => ({
 	playing: state.player.playing,
-	currentSongId: state.player.currentSongId
+	currentSongId: state.player.currentSongId,
+	player: state.player
 });
 
 const mapDispatch = {
 	resume,
-	pause
+	pause,
+	changeVolume
 };
 
 const connector = connect(mapState, mapDispatch);
@@ -50,15 +53,16 @@ class NavItem extends React.Component<{switchTo: () => void, selected: boolean}>
 	}
 }
 
-class BottomPanel extends React.Component<Props, {expanded: boolean, selectedTab: number}> {
+class BottomPanel extends React.Component<Props, {expanded: boolean, selectedTab: number, showVolume: boolean}> {
 	state = {
-		expanded: true,
-		selectedTab: 1
+		expanded: false,
+		selectedTab: 1,
+		showVolume: false
 	};
 
 	render() {
-		const {playing, resume, pause, currentSongId} = this.props;
-		const {expanded, selectedTab} = this.state;
+		const {player, playing, resume, pause, currentSongId, changeVolume} = this.props;
+		const {expanded, selectedTab, showVolume} = this.state;
 
 		let ToggleIcon = () => playing ?
 			<img className={currentSongId ? "" : "cursor-not-allowed transition ease duration-200 opacity-20"} alt={"Pause"} src={Pause} onClick={() => pause()}/> :
@@ -68,11 +72,18 @@ class BottomPanel extends React.Component<Props, {expanded: boolean, selectedTab
 			<div className={`fixed w-full bottom-panel pt-28 ${expanded ? "expanded" : ""}`}>
 				<div className={"absolute top-0 w-full"}>
 					<div className={"flex h-20 items-center justify-center bottom-separator"}>
-						<div className={"absolute top-0 w-20 flex justify-center expand-button-area"} onClick={() => this.setState({expanded: !expanded})}>
+						<div className={"absolute top-0 w-20 flex justify-center expand-button-area z-10"} onClick={() => this.setState({expanded: !expanded})}>
 							{/* TODO: move as many styles as possible out of css and into className */}
 							<div className={"expand-button"}/>
 						</div>
-						<div className={"inline-flex gap-5"}>
+						<img className={`absolute left-8 ${showVolume ? "" : "transition ease duration-200 opacity-20 hover:opacity-100"}`}
+							 alt={"Volume"}
+							 src={Volume}
+							 onClick={() => this.setState({showVolume: !showVolume})}/>
+						<div className={`flex justify-center items-center absolute left-16 right-8 top-0 bottom-10 z-10 transition ease duration-150 ${showVolume ? "" : "opacity-0 pointer-events-none"}`}>
+							<input min={0} max={1} step={0.001} className={"w-full"} type={"range"} value={player.volume} onChange={(e) => changeVolume(e.target.valueAsNumber)}/>
+						</div>
+						<div className={`inline-flex gap-5 transition ease duration-150 ${showVolume ? "blur" : ""}`}>
 							{/* TODO: disable previous song if no recent play history, toggle if no current queue, next song if no queue after current song */}
 							<img alt={"Previous Song"} src={Rewind}/>
 							<ToggleIcon/>

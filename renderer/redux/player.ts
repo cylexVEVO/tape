@@ -11,7 +11,7 @@ interface State {
 
 const initialState: State = {
 	playing: false,
-	volume: 1,
+	volume: .5,
 	duration: 0,
 	position: 0,
 	currentSongId: ""
