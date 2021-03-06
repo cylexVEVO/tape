@@ -1,4 +1,4 @@
-export interface Song {
+export interface ISong {
 	location: string,
 	metadata: {
 		title: string,
@@ -6,5 +6,17 @@ export interface Song {
 		artist: string,
 		duration: number
 	},
-	id: string
+	id: string,
+	favorited: boolean
+}
+
+// TODO: implement dynamic playlists
+export interface IMixtape {
+	name: string,
+	id: string,
+	icon: string,
+	dynamic: boolean,
+	songs: string[],
+	// Only used when mixtape is dynamic
+	include: string[]
 }

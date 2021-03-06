@@ -1,6 +1,6 @@
 import {join} from "path";
 import {format} from "url";
-import {BrowserWindow, app, ipcMain} from "electron";
+import {BrowserWindow, app, ipcMain, Menu} from "electron";
 import isDev from "electron-is-dev";
 import prepareNext from "electron-next";
 import {parseBuffer} from "music-metadata";
@@ -21,6 +21,53 @@ app.on("ready", async () => {
 			enableRemoteModule: true
 		},
 		titleBarStyle: "hiddenInset"
+	});
+
+	// TODO: disable menu items when they can't be used
+	const DockPrevious = {
+		label: "Previous",
+		click() {
+			mainWindow.webContents.send("pause");
+		}
+	};
+
+	const DockNext = {
+		label: "Next",
+		click() {
+			mainWindow.webContents.send("next");
+		}
+	};
+
+	const dockMenu = Menu.buildFromTemplate([
+		DockPrevious,
+		{
+			label: "Play",
+			click() {
+				mainWindow.webContents.send("previous");
+			}
+		},
+		DockNext
+	]);
+
+	app.dock.setMenu(dockMenu);
+
+	ipcMain.on("updateDockMenu", async (_, playing: boolean) => {
+		const dockMenu = Menu.buildFromTemplate([
+			DockPrevious,
+			{
+				label: playing ? "Pause" : "Play",
+				click() {
+					if (playing) {
+						mainWindow.webContents.send("pause");
+					} else {
+						mainWindow.webContents.send("play");
+					}
+				}
+			},
+			DockNext
+		]);
+
+		app.dock.setMenu(dockMenu);
 	});
 
 	const url = isDev

@@ -1,5 +1,6 @@
 import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {RootState} from "./index";
+import {RootState, addHistory, dequeue, removeHistory, queue} from ".";
+import {ISong} from "../interfaces";
 
 interface State {
 	playing: boolean,
@@ -20,24 +21,72 @@ const initialState: State = {
 const setupAudioContext = createAsyncThunk<void, void, {state: RootState}>(
 	"player/setupAudioContext",
 	async (_, thunkAPI) => {
+		const ipcRenderer = window.require("electron").ipcRenderer;
 		const audioContext = new AudioContext();
 		const audioElement = document.querySelector<HTMLMediaElement>("#audio")!;
 		const track = audioContext.createMediaElementSource(audioElement);
 		track.connect(audioContext.destination);
 
-		// Start animation on playback start
 		audioElement.addEventListener("play", () => {
+			ipcRenderer.send("updateDockMenu", true);
 			thunkAPI.dispatch(startAnimation());
 		});
 
-		// Stop animation on playback stop
 		const stopAnim = () => {
-			if (audioElement.currentTime === audioElement.duration) audioElement.src = "";
+			ipcRenderer.send("updateDockMenu", false);
+			if (audioElement.currentTime === audioElement.duration) {
+				// don't run if there's any songs in queue, otherwise we'd end up with duplicate history
+				if (!thunkAPI.getState().queue.songs.length) {
+					thunkAPI.dispatch(resetSong());
+				}
+			}
 			thunkAPI.dispatch(stopAnimation());
 		};
 
-		audioElement.addEventListener("pause", stopAnim);
-		audioElement.addEventListener("ended", stopAnim);
+		// Handle events from dock menu
+		ipcRenderer.on("play", () => {
+			if (audioElement.src) {
+				audioElement.play();
+			}
+		});
+
+		ipcRenderer.on("pause", () => {
+			audioElement.pause();
+		});
+
+		ipcRenderer.on("previous", () => {
+			const previous = thunkAPI.getState().queue.history[0];
+
+			if (thunkAPI.getState().queue.history.length && previous) {
+				play(previous);
+				thunkAPI.dispatch(queue(thunkAPI.getState().player.currentSongId));
+				removeHistory(0);
+			}
+		});
+
+		ipcRenderer.on("next", () => {
+			const next = thunkAPI.getState().queue.songs[0];
+
+			if (thunkAPI.getState().queue.songs.length && next) {
+				play(next);
+				thunkAPI.dispatch(addHistory(thunkAPI.getState().player.currentSongId));
+				dequeue(0);
+			}
+		});
+
+		audioElement.addEventListener("pause", () => {
+			// Play next song in queue if there is one
+			const audioElement = document.querySelector<HTMLMediaElement>("#audio")!;
+			if (audioElement.currentTime === audioElement.duration) {
+				thunkAPI.dispatch(addHistory(thunkAPI.getState().player.currentSongId));
+				if (thunkAPI.getState().queue.songs[0]) {
+					thunkAPI.dispatch(play(thunkAPI.getState().queue.songs[0]));
+					thunkAPI.dispatch(dequeue(0));
+				}
+			}
+
+			stopAnim();
+		});
 		global.audioContext = audioContext;
 	}
 );
@@ -46,7 +95,7 @@ const play = createAsyncThunk<{src: string, id: string}, string, {state: RootSta
 	"player/play",
 	async (id, thunkAPI) => {
 		const fs = window.require("fs");
-		const {location} = thunkAPI.getState().library.songs.find((song) => song.id === id)!;
+		const {location} = thunkAPI.getState().library.songs.find((song: ISong) => song.id === id)!;
 
 		try {
 			let blob = new Blob([await fs.readFileSync(location).buffer]);
@@ -111,11 +160,8 @@ const {actions, reducer: playerReducer} = createSlice({
 			state.currentSongId = id;
 			audio.play();
 		}).addCase(play.rejected, (_, action) => {
-			const remote = window.require("@electron/remote");
-			const dialog = remote.dialog;
-
 			// TODO: change this into an in-app prompt to choose new location or remove from library, this'll do for now
-			dialog.showErrorBox("An error occurred.", action.payload);
+			window.require("@electron/remote").dialog.showErrorBox("An error occurred.", action.payload);
 		}).addCase(setupAudioContext.pending, (state) => {
 			state.playing = false;
 			state.currentSongId = "";

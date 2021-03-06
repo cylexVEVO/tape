@@ -1,23 +1,45 @@
 import * as React from "react";
-import {RootState, resume, pause, changeVolume} from "../redux";
+import {
+	RootState,
+	resume,
+	pause,
+	changeVolume,
+	clearQueue,
+	clearHistory,
+	dequeue,
+	play,
+	removeHistory,
+	addHistory,
+	queue
+} from "../redux";
 import {connect, ConnectedProps} from "react-redux";
 import Library from "./Library";
-import Rewind from "../../assets/img/rewind.svg";
-import Play from "../../assets/img/play.svg";
-import Pause from "../../assets/img/pause.svg";
-import FastForward from "../../assets/img/fast-forward.svg";
-import Volume from "../../assets/img/volume-up.svg";
+import Rewind from "@img/rewind.svg";
+import Play from "@img/play.svg";
+import Pause from "@img/pause.svg";
+import FastForward from "@img/fast-forward.svg";
+import Volume from "@img/volume-up.svg";
+import Queue from "@components/Queue";
+import Mixtape from "@components/Mixtape";
 
 const mapState = (state: RootState) => ({
 	playing: state.player.playing,
 	currentSongId: state.player.currentSongId,
-	player: state.player
+	player: state.player,
+	queue: state.queue
 });
 
 const mapDispatch = {
+	play,
 	resume,
 	pause,
-	changeVolume
+	changeVolume,
+	clearQueue,
+	clearHistory,
+	dequeue,
+	removeHistory,
+	addHistory,
+	queueSong: queue
 };
 
 const connector = connect(mapState, mapDispatch);
@@ -55,8 +77,8 @@ class NavItem extends React.Component<{switchTo: () => void, selected: boolean}>
 
 class BottomPanel extends React.Component<Props, {expanded: boolean, selectedTab: number, showVolume: boolean, volumeHideTimeout: number}> {
 	state = {
-		expanded: false,
-		selectedTab: 1,
+		expanded: true,
+		selectedTab: 2,
 		showVolume: false,
 		volumeHideTimeout: 0
 	};
@@ -85,16 +107,34 @@ class BottomPanel extends React.Component<Props, {expanded: boolean, selectedTab
 		}
 	}
 
+	playNext() {
+		const {play, queue, dequeue, currentSongId, addHistory} = this.props;
+		const next = queue.songs[0];
+
+		if (queue.songs.length && next) {
+			addHistory(currentSongId);
+			play(next);
+			dequeue(0);
+		}
+	}
+
+	playPrevious() {
+		const {play, queue, removeHistory, currentSongId, queueSong} = this.props;
+		const previous = queue.history[0];
+
+		if (queue.history.length && previous) {
+			queueSong({id: currentSongId, position: "first"});
+			play(previous);
+			removeHistory(0);
+		}
+	}
+
 	render() {
-		const {player, playing, resume, pause, currentSongId, changeVolume} = this.props;
+		const {player, playing, resume, pause, currentSongId, changeVolume, queue} = this.props;
 		const {expanded, selectedTab, showVolume} = this.state;
 
-		let ToggleIcon = () => playing ?
-			<img className={currentSongId ? "" : "cursor-not-allowed opacity-20"} alt={"Pause"} src={Pause} onClick={() => pause()}/> :
-			<img className={currentSongId ? "" : "cursor-not-allowed opacity-20"} alt={"Play"} src={Play} onClick={() => resume()}/>;
-
 		return (
-			<div className={`fixed w-full bottom-panel pt-28 ${expanded ? "expanded" : ""}`}>
+			<div id={"bottom-panel"} className={`fixed w-full bottom-panel pt-28 ${expanded ? "expanded" : ""}`}>
 				<div className={"absolute top-0 w-full"}>
 					<div className={"flex h-20 items-center justify-center bottom-separator"}>
 						<div className={"absolute top-0 w-20 flex justify-center expand-button-area z-20"} onClick={() => this.setState({expanded: !expanded})}>
@@ -110,9 +150,14 @@ class BottomPanel extends React.Component<Props, {expanded: boolean, selectedTab
 						</div>
 						<div className={`inline-flex gap-5 transition ease duration-150 ${showVolume ? "blur" : ""}`}>
 							{/* TODO: disable previous song if no recent play history, toggle if no current queue, next song if no queue after current song */}
-							<img alt={"Previous Song"} src={Rewind}/>
-							<ToggleIcon/>
-							<img alt={"Next Song"} src={FastForward}/>
+							<img className={queue.history.length ? "" : "cursor-not-allowed opacity-20"} alt={"Previous Song"} src={Rewind} onClick={() => this.playPrevious()}/>
+							{playing &&
+								<img className={currentSongId ? "" : "cursor-not-allowed opacity-20"} alt={"Pause"} src={Pause} onClick={() => pause()}/>
+							}
+							{!playing &&
+								<img className={currentSongId ? "" : "cursor-not-allowed opacity-20"} alt={"Play"} src={Play} onClick={() => resume()}/>
+							}
+							<img className={queue.songs.length ? "" : "cursor-not-allowed opacity-20"} alt={"Next Song"} src={FastForward} onClick={() => this.playNext()}/>
 						</div>
 					</div>
 					<div className={"flex gap-5 nav items-center justify-center bottom-separator"}>
@@ -120,7 +165,7 @@ class BottomPanel extends React.Component<Props, {expanded: boolean, selectedTab
 							Library
 						</NavItem>
 						<NavItem switchTo={() => this.setState({selectedTab: 2})} selected={selectedTab === 2}>
-							Playlists
+							Mixtapes
 						</NavItem>
 						<NavItem switchTo={() => this.setState({selectedTab: 3})} selected={selectedTab === 3}>
 							Queue
@@ -134,10 +179,10 @@ class BottomPanel extends React.Component<Props, {expanded: boolean, selectedTab
 						<Library/>
 					</NavTab>
 					<NavTab show={selectedTab === 2}>
-						Playlists
+						<Mixtape/>
 					</NavTab>
 					<NavTab show={selectedTab === 3}>
-						Queue
+						<Queue/>
 					</NavTab>
 				</div>
 			</div>

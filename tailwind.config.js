@@ -5,7 +5,12 @@ module.exports = {
 		fontFamily: {
 			sans: ["Inter", "sans-serif"]
 		},
-		extend: {}
+		extend: {
+			zIndex: {
+				"100": "100",
+				"110": "110"
+			}
+		}
 	},
 	variants: {
 		extend: {}

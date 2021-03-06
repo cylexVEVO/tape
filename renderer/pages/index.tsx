@@ -1,8 +1,8 @@
 import * as React from "react";
-import Tape from "../components/Tape";
+import Tape from "@components/Tape";
 import {setupAudioContext} from "../redux";
 import {connect, ConnectedProps} from "react-redux";
-import BottomPanel from "../components/BottomPanel";
+import BottomPanel from "@components/BottomPanel";
 
 const connector = connect(null, {setupAudioContext});
 
@@ -16,6 +16,8 @@ class Index extends React.Component<Props> {
 	render() {
 		return (
 			<div className={"h-full bg-black flex items-center justify-center text-white font-sans"}>
+				<div className={"fixed w-full top-0 drag-region"}/>
+				<div id={"modal-mount"} className={"modal-mount"}/>
 				<audio id={"audio"}/>
 				<Tape/>
 				<BottomPanel/>
