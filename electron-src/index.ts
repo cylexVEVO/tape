@@ -23,52 +23,54 @@ app.on("ready", async () => {
 		titleBarStyle: "hiddenInset"
 	});
 
-	// TODO: disable menu items when they can't be used
-	const DockPrevious = {
-		label: "Previous",
-		click() {
-			mainWindow.webContents.send("pause");
-		}
-	};
-
-	const DockNext = {
-		label: "Next",
-		click() {
-			mainWindow.webContents.send("next");
-		}
-	};
-
-	const dockMenu = Menu.buildFromTemplate([
-		DockPrevious,
-		{
-			label: "Play",
+	if (process.platform === "darwin") {
+		// TODO: disable menu items when they can't be used
+		const DockPrevious = {
+			label: "Previous",
 			click() {
-				mainWindow.webContents.send("previous");
+				mainWindow.webContents.send("pause");
 			}
-		},
-		DockNext
-	]);
+		};
 
-	app.dock.setMenu(dockMenu);
+		const DockNext = {
+			label: "Next",
+			click() {
+				mainWindow.webContents.send("next");
+			}
+		};
 
-	ipcMain.on("updateDockMenu", async (_, playing: boolean) => {
 		const dockMenu = Menu.buildFromTemplate([
 			DockPrevious,
 			{
-				label: playing ? "Pause" : "Play",
+				label: "Play",
 				click() {
-					if (playing) {
-						mainWindow.webContents.send("pause");
-					} else {
-						mainWindow.webContents.send("play");
-					}
+					mainWindow.webContents.send("previous");
 				}
 			},
 			DockNext
 		]);
 
 		app.dock.setMenu(dockMenu);
-	});
+
+		ipcMain.on("updateDockMenu", async (_, playing: boolean) => {
+			const dockMenu = Menu.buildFromTemplate([
+				DockPrevious,
+				{
+					label: playing ? "Pause" : "Play",
+					click() {
+						if (playing) {
+							mainWindow.webContents.send("pause");
+						} else {
+							mainWindow.webContents.send("play");
+						}
+					}
+				},
+				DockNext
+			]);
+
+			app.dock.setMenu(dockMenu);
+		});
+	}
 
 	const url = isDev
 		? "http://localhost:8000/"

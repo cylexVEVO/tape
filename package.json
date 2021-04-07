@@ -1,6 +1,6 @@
 {
   "name": "tape-audio",
-  "version": "0.1.3-beta2",
+  "version": "0.1.3-beta2-1",
   "license": "GPL-3.0-only",
   "main": "main/index.js",
   "productName": "Tape Audio",

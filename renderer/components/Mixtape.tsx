@@ -1,5 +1,5 @@
 import * as React from "react";
-import {addHistory, mixtape_removeSong, pause, play, removeMixtape, resetSong, resume, RootState} from "../redux";
+import {addHistory, mixtape_removeSong, pause, play, removeMixtape, resume, RootState} from "../redux";
 import {connect, ConnectedProps} from "react-redux";
 import {IMixtape, ISong} from "../interfaces";
 import InlinePause from "@img/pause-inline.svg";
@@ -10,8 +10,6 @@ import Trash from "@img/trash.svg";
 import TrashConfirm from "@img/trash-confirm.svg";
 import WithConfirm from "@components/WithConfirm";
 import {useEffect, useState} from "react";
-import SelectMixtapes from "@components/SelectMixtapes";
-import Plus from "@img/plus-circle.svg";
 
 const mapState = (state: RootState) => ({
 	library: state.library,
