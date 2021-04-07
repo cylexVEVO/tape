@@ -12,6 +12,15 @@
 	user-select: none;
 }
 
+input[type="text"] {
+	@apply transition ease-in-out duration-200 bg-transparent w-full focus:outline-none pl-1 pb-1;
+	border-bottom: rgba(255, 255, 255, .1) 1px solid;
+}
+
+input[type="text"]:focus {
+	border-bottom: rgba(255, 255, 255, .3) 1px solid;
+}
+
 button:disabled {
 	@apply opacity-20 cursor-not-allowed;
 }
@@ -58,6 +67,14 @@ html, body, body > div:first-child, div#__next, div#__next > div {
 	border-bottom: rgba(255, 255, 255, .03) 1px solid;
 }
 
+.top-separator {
+	border-top: rgba(255, 255, 255, .03) 1px solid;
+}
+
+.border-transparent {
+	border-color: transparent !important;
+}
+
 .nav-item {
 	font-size: 15px;
 }
@@ -93,6 +110,20 @@ html, body, body > div:first-child, div#__next, div#__next > div {
 .mixtape .text {
 	bottom: 10px;
 	left: 10px;
+}
+
+.mixtape .create {
+	left: 10px;
+	top: 0;
+}
+
+.mixtape .delete {
+	right: 10px;
+	top: 10px;
+}
+
+.mixtape .delete * {
+	z-index: 40;
 }
 
 .bg {
@@ -144,6 +175,11 @@ html, body, body > div:first-child, div#__next, div#__next > div {
 
 .modal .controls {
 	background-color: rgba(0, 0, 0, .1);
+}
+
+.table-grid {
+	@apply grid;
+	grid-template-columns: 26px repeat(4, minmax(0, 1fr));
 }
 
 /* region Scrollbar */

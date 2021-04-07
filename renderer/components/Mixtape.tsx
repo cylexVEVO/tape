@@ -1,12 +1,17 @@
 import * as React from "react";
-import {RootState} from "../redux";
+import {addHistory, mixtape_removeSong, pause, play, removeMixtape, resetSong, resume, RootState} from "../redux";
 import {connect, ConnectedProps} from "react-redux";
-import {IMixtape} from "../interfaces";
-import Song from "@components/Song";
+import {IMixtape, ISong} from "../interfaces";
 import InlinePause from "@img/pause-inline.svg";
 import InlinePlay from "@img/play-inline.svg";
 import Clock from "@img/clock.svg";
 import CreateMixtape from "@components/CreateMixtape";
+import Trash from "@img/trash.svg";
+import TrashConfirm from "@img/trash-confirm.svg";
+import WithConfirm from "@components/WithConfirm";
+import {useEffect, useState} from "react";
+import SelectMixtapes from "@components/SelectMixtapes";
+import Plus from "@img/plus-circle.svg";
 
 const mapState = (state: RootState) => ({
 	library: state.library,
@@ -14,9 +19,132 @@ const mapState = (state: RootState) => ({
 	playing: state.player.playing
 });
 
-const connector = connect(mapState);
+const mapDispatch = {
+	removeMixtape,
+	pause,
+	play,
+	resume,
+	addHistory,
+	mixtape_removeSong
+}
+
+const connector = connect(mapState, mapDispatch);
 
 type Props = ConnectedProps<typeof connector>;
+
+const UTable: React.FC<Props & {songs: {songId: string, mixtapeId: string}[], mixtape: string}> = (props) => {
+	const {playing, currentSongId, play, pause, resume, addHistory, mixtape_removeSong} = props;
+
+	const removeSelected = () => {
+		setSelected([]);
+		selected.map((id) => mixtape_removeSong({mixtape: props.mixtape, mixtapeId: id}));
+	}
+
+	const inlineControlToggle = (id: string) => {
+		if (playing && currentSongId === id) pause();
+		if (!playing && currentSongId === id) resume();
+		if ((playing || !playing) && currentSongId !== id) {
+			addHistory(currentSongId);
+			play(id);
+		}
+	};
+
+	const getLength = (length: number): string => {
+		// modified version of https://stackoverflow.com/a/34841026
+		const hours = Math.floor(length / 3600);
+		const minutes = Math.floor(length / 60) % 60;
+		const seconds = length % 60;
+
+		let x = [hours, minutes, seconds]
+			.map((v) => v < 10 ? "0" + v : v)
+			.filter((v, i) => v !== "00" || i > 0)
+			.join(":");
+
+		if (x.length === 5 && x.split("")[0] === "0") x = x.substr(1);
+
+		return x;
+	};
+
+	const [selected, setSelected] = useState<string[]>([]);
+	const [selectMultipleDown, setSelectMultipleDown] = useState(false);
+
+	useEffect(() => {
+		window.addEventListener("keydown", (e) => {
+			if (e.key === "Control" || e.key === "Meta") setSelectMultipleDown(true);
+		});
+		window.addEventListener("keyup", (e) => {
+			if (e.key === "Control" || e.key === "Meta") setSelectMultipleDown(false);
+		});
+	}, []);
+
+	const toggleRow = (id: string) => {
+		if (document.querySelector(`#inline-control-${id}:hover`)) return;
+
+		if (selectMultipleDown) {
+			if (selected.includes(id)) setSelected(selected.filter((x) => x !== id));
+			if (!selected.includes(id)) setSelected([...selected, id]);
+		} else {
+			if (selected.includes(id)) {
+				if (selected.length > 1) setSelected([id]);
+				if (selected.length === 1) setSelected([]);
+			}
+			if (!selected.includes(id)) setSelected([id]);
+		}
+	};
+
+	return (
+		<div>
+			{selected.length > 0 &&
+				<div className={"flex w-full gap-4"}>
+					<WithConfirm action={() => removeSelected()}>
+						<button className={"flex items-center gap-1 focus:outline-none hover-opacity"}>
+							<img alt={""} src={Trash}/>
+							Remove selected
+						</button>
+						<button className={"flex items-center gap-1 focus:outline-none text-red-500"}>
+							<img alt={""} src={TrashConfirm}/>
+							Confirm
+						</button>
+					</WithConfirm>
+				</div>
+			}
+			<div className={"table-grid opacity-20"}>
+				<div/>
+				<div className={"-ml-1"}>Title</div>
+				<div className={"text-right"}>Album</div>
+				<div className={"text-right"}>Artist</div>
+				<div className={"flex items-center"}><img className={"ml-auto"} alt={"Length"} src={Clock}/></div>
+			</div>
+			{props.songs.map((song: {songId: string, mixtapeId: string}, idx: number) => {
+				const {metadata: {title, artist, album, duration}} = props.library.songs.find((x: ISong) => x.id === song.songId);
+				let showSeparator = true;
+
+				if (idx === 0) showSeparator = false;
+				if (selected.includes(song.mixtapeId)) showSeparator = false;
+				if (selected.includes(props.songs[idx - 1]?.mixtapeId)) showSeparator = false;
+
+				return (
+					<div className={`top-separator ${!showSeparator ? "border-transparent" : ""}`} key={song.mixtapeId}>
+						<div className={`table-grid ${selected.includes(song.mixtapeId) ? "rounded-md bg-blue-500 p-4 -mx-4" : "p-2 my-2 -mx-2"}`} onClick={() => toggleRow(song.mixtapeId)}>
+							<div className={"flex items-center z-[200]"}>
+								<img id={`inline-control-${song.mixtapeId}`} className={"hover-opacity"}
+									 alt={playing && currentSongId === song.songId ? "Pause" : "Play"}
+									 src={playing && currentSongId === song.songId ? InlinePause : InlinePlay}
+									 onClick={() => inlineControlToggle(song.songId)}/>
+							</div>
+							<div>{title}</div>
+							<div className={"text-right"}>{album}</div>
+							<div className={"text-right"}>{artist}</div>
+							<div className={"text-right"}>{getLength(duration)}</div>
+						</div>
+					</div>
+				);
+			})}
+		</div>
+	);
+};
+
+const Table = connector(UTable);
 
 class Mixtape extends React.Component<Props, {selected: string, showCreateMixtape: boolean}> {
 	state = {
@@ -25,7 +153,7 @@ class Mixtape extends React.Component<Props, {selected: string, showCreateMixtap
 	};
 
 	playlistView() {
-		const {library: {mixtapes}, playing, currentSongId} = this.props;
+		const {library: {mixtapes}} = this.props;
 		const {selected} = this.state;
 		const {name, songs} = mixtapes.filter((mixtape: IMixtape) => mixtape.id === selected)[0];
 
@@ -43,42 +171,20 @@ class Mixtape extends React.Component<Props, {selected: string, showCreateMixtap
 						<div className={"text-xs opacity-20"}>
 							{songs.length} songs
 						</div>
+						<WithConfirm action={() => {
+							this.props.removeMixtape(selected);
+							this.setState({selected: ""});
+						}}>
+							<button className={"focus:outline-none hover-opacity"}>
+								<img alt={""} src={Trash}/>
+							</button>
+							<button className={"focus:outline-none text-red-500"}>
+								<img alt={""} src={TrashConfirm}/>
+							</button>
+						</WithConfirm>
 					</div>
 				</div>
-				<table className={"table-auto w-full"}>
-					<thead>
-					<tr>
-						<th/>
-						<th className={"font-normal text-left"}>
-							<div className={"opacity-20"}>Title</div>
-						</th>
-						<th className={"font-normal opacity-20 text-right"}>Album</th>
-						<th className={"font-normal opacity-20 text-right"}>Artist</th>
-						<th><img className={"ml-auto"} alt={"Length"} src={Clock}/></th>
-					</tr>
-					</thead>
-					<tbody>
-						{songs.map((id: string) => {
-							return (
-								<>
-									<Song key={id} id={id} icon={
-										<img className={"hover-opacity mr-2"}
-											 alt={playing && currentSongId === id ? "Pause" : "Play"}
-											 src={playing && currentSongId === id ? InlinePause : InlinePlay}/>
-									}/>
-
-									{songs.indexOf(id) !== songs.length - 1 &&
-										<tr key={`${id}-separator`}>
-											<td className={"py-1"} colSpan={5}>
-												<div className={"bottom-separator"}/>
-											</td>
-										</tr>
-									}
-								</>
-							);
-						})}
-					</tbody>
-				</table>
+				<Table songs={songs} mixtape={selected}/>
 			</div>
 		);
 	}
@@ -104,8 +210,13 @@ class Mixtape extends React.Component<Props, {selected: string, showCreateMixtap
 								</div>
 							);
 						})}
-						<div className={"hover-opacity"} onClick={() => this.setState({showCreateMixtape: true})}>
-							create playlist
+						<div className={"mixtape relative hover-opacity border-4 border-white"} onClick={() => this.setState({showCreateMixtape: true})}>
+							<div className={"absolute pointer-events-none create z-30 text-3xl"}>
+								+
+							</div>
+							<div className={"absolute pointer-events-none text z-30"}>
+								create mixtape
+							</div>
 						</div>
 					</div>
 				}

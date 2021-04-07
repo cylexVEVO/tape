@@ -19,7 +19,7 @@ class CreateMixtape extends React.Component<Props & {show: boolean, hide: () => 
 	create() {
 		// TODO: provide feedback 4 invalid fields
 		if (Object.values(this.state).includes("")) return;
-		this.props.addMixtape({...this.state, ...{icon: "", dynamic: false, songs: [] as string[], include: [] as string[]}});
+		this.props.addMixtape({...this.state, ...{icon: "", dynamic: false, songs: [], include: []}});
 		setTimeout(() => this.props.hide(), 100);
 	}
 
@@ -34,7 +34,7 @@ class CreateMixtape extends React.Component<Props & {show: boolean, hide: () => 
 					<div className={"text-xl"}>
 						Create a Mixtape
 					</div>
-					<input value={name} onChange={(e) => this.setState({name: e.target.value})} placeholder={"Mixtape name"} className={"text-black"}/>
+					<input type={"text"} value={name} onChange={(e) => this.setState({name: e.target.value})} placeholder={"Mixtape name"} className={"my-2"}/>
 				</>
 				<button className={"hover-opacity"} onClick={() => this.create()}>create mixtape</button>
 			</Modal>

@@ -1,5 +1,5 @@
 import * as React from "react";
-import Table from "@components/Table";
+import Table from "@components/SongTable";
 import ImportSongs from "@components/ImportSongs";
 
 class Library extends React.Component {

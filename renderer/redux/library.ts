@@ -29,9 +29,8 @@ const removeSong = createAsyncThunk<string, string, {state: RootState}>(
 		thunkAPI.getState().queue.history.map((id2: string) => id2 === id).map(() => thunkAPI.dispatch(removeHistory(thunkAPI.getState().queue.history.indexOf(id))));
 		thunkAPI.getState().queue.songs.map((id2: string) => id2 === id).map(() => thunkAPI.dispatch(dequeue(thunkAPI.getState().queue.songs.indexOf(id))));
 		thunkAPI.getState().library.mixtapes.map((mixtape: IMixtape) => {
-			mixtape.songs.map((id2, i) => {
-				if (id2 === id) thunkAPI.dispatch(mixtape_removeSong({mixtape: mixtape.id, position: i}));
-				console.log(thunkAPI.getState().library.mixtapes[0].songs);
+			mixtape.songs.map((id2) => {
+				thunkAPI.dispatch(_mixtape_removeInstances({mixtape: mixtape.id, id: id2.songId}));
 			});
 		});
 
@@ -43,7 +42,7 @@ const {actions, reducer} = createSlice({
 	name: "library",
 	initialState,
 	reducers: {
-		addMixtape: (state, action: PayloadAction<{name: string, icon: string, dynamic: boolean, songs: string[], include: string[]}>) => {
+		addMixtape: (state, action: PayloadAction<{name: string, icon: string, dynamic: boolean, songs: {songId: string, mixtapeId: string}[], include: string[]}>) => {
 			let id = crypto.randomBytes(8).toString("hex");
 			while (state.mixtapes.find((mixtape) => mixtape.id === id)) id = crypto.randomBytes(8).toString("hex");
 
@@ -56,12 +55,18 @@ const {actions, reducer} = createSlice({
 		},
 		mixtape_addSong: (state, action: PayloadAction<{mixtape: string, song: string}>) => {
 			const i = state.mixtapes.indexOf(state.mixtapes.filter((mixtape) => mixtape.id === action.payload.mixtape)[0]);
-			state.mixtapes[i].songs.push(action.payload.song);
+			let id = crypto.randomBytes(8).toString("hex");
+			while (state.mixtapes.find((mixtape) => mixtape.id === action.payload.mixtape)!.songs.find((song) => song.mixtapeId === id)) id = crypto.randomBytes(8).toString("hex");
+			state.mixtapes[i].songs.push({songId: action.payload.song, mixtapeId: id});
 		},
-		mixtape_removeSong: (state, action: PayloadAction<{mixtape: string, position: number}>) => {
-			console.log(action.payload.position);
+		mixtape_removeSong: (state, action: PayloadAction<{mixtape: string, mixtapeId: string}>) => {
 			const i = state.mixtapes.indexOf(state.mixtapes.filter((mixtape) => mixtape.id === action.payload.mixtape)[0]);
-			state.mixtapes[i].songs.splice(action.payload.position, 1);
+			const ii = state.mixtapes[i].songs.indexOf(state.mixtapes[i].songs.find((song) => song.mixtapeId === action.payload.mixtapeId)!);
+			state.mixtapes[i].songs.splice(ii, 1);
+		},
+		_mixtape_removeInstances: (state, action: PayloadAction<{mixtape: string, id: string}>) => {
+			const i = state.mixtapes.indexOf(state.mixtapes.filter((mixtape) => mixtape.id === action.payload.mixtape)[0]);
+			state.mixtapes[i].songs = state.mixtapes[i].songs.filter((song) => song.songId === action.payload.id);
 		},
 		mixtape_addMixtape: (_, __: PayloadAction<string>) => {},
 		mixtape_removeMixtape: (_, __: PayloadAction<string>) => {},
@@ -77,13 +82,14 @@ const {actions, reducer} = createSlice({
 	}
 });
 
-const {addMixtape, mixtape_addSong, mixtape_removeSong} = actions;
+const {addMixtape, removeMixtape, mixtape_addSong, mixtape_removeSong, _mixtape_removeInstances} = actions;
 
 export {
 	reducer as libraryReducer,
 	addSong,
 	removeSong,
 	addMixtape,
+	removeMixtape,
 	mixtape_addSong,
 	mixtape_removeSong
 };

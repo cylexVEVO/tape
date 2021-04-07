@@ -16,7 +16,7 @@ export interface IMixtape {
 	id: string,
 	icon: string,
 	dynamic: boolean,
-	songs: string[],
+	songs: {songId: string, mixtapeId: string}[],
 	// Only used when mixtape is dynamic
 	include: string[]
 }
